@@ -1,190 +1,82 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flappy Bird Replica</title>
+    <title>Reading test</title>
     <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            font-family: Arial, sans-serif;
-        }
-
-        #game {
-            position: relative;
-            width: 100vw;
+        .container {
+            text-align: center;
             height: 100vh;
-            background-color: #70c5ce; /* Sky Blue */
-            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            animation: slideUp 0.5s ease-in-out forwards;
         }
 
-        #bird {
-            position: absolute;
-            width: 40px;
-            height: 40px;
-            background-color: yellow;
-            border-radius: 50%;
-            top: 40vh;
-            left: 20vw;
-            z-index: 2; /* Bird should be above pipes */
+        .menu {
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            transition: color 0.5s ease-in-out, opacity 0.5s ease-in-out;
         }
 
-        .pipe {
-            position: absolute;
-            width: 60px;
-            background-color: green;
+        .begin-button {
+            padding: 15px 30px;
+            font-size: 20px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease-in-out, transform 0.5s ease-in-out, color 0.5s ease-in-out, opacity 0.5s ease-in-out;
+            border-radius: 30px;
         }
 
-        .pipe.top {
-            height: 20vh; /* Upper pipe height */
-            top: 0;
+        .begin-button:hover {
+            background-color: #666;
         }
 
-        .pipe.bottom {
-            height: 30vh; /* Lower pipe height */
-            bottom: 0;
+        .fading {
+            color: #fff;
+            opacity: 0;
         }
 
-        #score {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            font-size: 24px;
-            color: white;
-            z-index: 3; /* Score should be above everything else */
+        @keyframes slideUp {
+            0% {
+                transform: translateY(100%);
+            }
+            100% {
+                transform: translateY(0);
+            }
         }
     </style>
 </head>
 <body>
-    <div id="game">
-        <div id="bird"></div>
-        <div id="score">Score: 0</div>
+    <div class="container">
+        <h1 class="menu">RSVP Reading Test</h1>
+        <button class="begin-button" onclick="redirectToRSVP()">Begin</button>
     </div>
     <script>
-        const bird = document.getElementById('bird');
-        const game = document.getElementById('game');
-        const scoreDisplay = document.getElementById('score');
+        function redirectToRSVP() {
+            const container = document.querySelector('.container');
+            const menu = document.querySelector('.menu');
+            const button = document.querySelector('.begin-button');
 
-        let birdY = 40; // Initial bird position (percent)
-        let gravity = 0.11; // Gravity force (lower for slower descent)
-        let lift = -2; // Lift force (lower for less jump sensitivity)
-        let velocity = 0; // Bird velocity
-        let damping = 0.95; // Damping factor to further slow down changes
-        let maxRiseSpeed = -2; // Cap for maximum rise speed (no cap for falling speed)
-        let pipeInterval = 2000; // Interval between pipe generation in ms
-        let pipeSpeed = 4.5; // Reduced speed of pipes moving left
-        let score = 0; // Initialize score
+            // Start fading out the text and button
+            setTimeout(() => {
+                menu.classList.add('fading');
+                button.classList.add('fading');
+            }, 250); // Adjust the delay as needed
 
-        // Handle bird movement
-        function updateBird() {
-            velocity += gravity; // Apply gravity to velocity
-            if (velocity < maxRiseSpeed) {
-                velocity = maxRiseSpeed; // Limit upward velocity only
-            }
-            velocity *= damping; // Apply damping to reduce velocity
+            // Remove the 'fading' class before redirecting
+            setTimeout(() => {
+                menu.classList.remove('fading');
+                button.classList.remove('fading');
 
-            birdY += velocity; // Apply velocity to position
-
-            // Prevent bird from going out of bounds
-            if (birdY <= 0) {
-                birdY = 0;
-                velocity = 0;
-            }
-            if (birdY >= 100 - parseFloat(getComputedStyle(bird).height) / window.innerHeight * 100) {
-                birdY = 100 - parseFloat(getComputedStyle(bird).height) / window.innerHeight * 100;
-                velocity = 0;
-            }
-
-            // Update bird position
-            bird.style.top = birdY + 'vh';
-
-            // Check for collision with pipes
-            checkCollision();
+                // Redirect to the desired URL
+                window.location.href = 'test.html'; // Replace with your actual URL
+            }, 750); // Adjust the delay as needed
         }
-
-        // Flap function to lift the bird
-        function flap() {
-            velocity = lift; // Set lift when flapping
-        }
-
-        // Function to create pipes
-        function createPipe() {
-            let gapHeight = 30; // Increased gap between top and bottom pipe in vh
-            let topHeight = Math.floor(Math.random() * (50 - gapHeight)) + 10; // Random height for top pipe
-
-            // Create top pipe
-            let topPipe = document.createElement('div');
-            topPipe.className = 'pipe top';
-            topPipe.style.height = topHeight + 'vh';
-            topPipe.style.right = 0;
-            game.appendChild(topPipe);
-
-            // Create bottom pipe
-            let bottomPipe = document.createElement('div');
-            bottomPipe.className = 'pipe bottom';
-            bottomPipe.style.height = (100 - topHeight - gapHeight) + 'vh';
-            bottomPipe.style.right = 0;
-            game.appendChild(bottomPipe);
-
-            // Move pipes left
-            movePipes(topPipe, bottomPipe);
-        }
-
-        // Function to move pipes
-        function movePipes(topPipe, bottomPipe) {
-            let pipeInterval = setInterval(() => {
-                let currentRight = parseFloat(topPipe.style.right);
-                topPipe.style.right = (currentRight + pipeSpeed) + 'px';
-                bottomPipe.style.right = (currentRight + pipeSpeed) + 'px';
-
-                // Increase score if pipes move out of the screen
-                if (currentRight > window.innerWidth) {
-                    score++; // Increment score
-                    scoreDisplay.textContent = 'Score: ' + score; // Update score display
-                    clearInterval(pipeInterval);
-                    topPipe.remove();
-                    bottomPipe.remove();
-                }
-            }, 20);
-        }
-
-        // Function to check collision with pipes
-        function checkCollision() {
-            const birdRect = bird.getBoundingClientRect();
-            const pipes = document.querySelectorAll('.pipe');
-
-            pipes.forEach(pipe => {
-                const pipeRect = pipe.getBoundingClientRect();
-                if (
-                    birdRect.left < pipeRect.left + pipeRect.width &&
-                    birdRect.left + birdRect.width > pipeRect.left &&
-                    birdRect.top < pipeRect.top + pipeRect.height &&
-                    birdRect.top + birdRect.height > pipeRect.top
-                ) {
-                    // Collision detected - Restart game
-                    alert('Game Over! Your score was: ' + score);
-                    location.reload();
-                }
-            });
-        }
-
-        // Listen for key press or click events to make the bird flap
-        window.addEventListener('keydown', flap);
-        window.addEventListener('click', flap);
-
-        // Game loop
-        function gameLoop() {
-            updateBird(); // Update bird's position
-            requestAnimationFrame(gameLoop); // Continue the loop
-        }
-
-        // Start the game loop
-        gameLoop();
-
-        // Create pipes at regular intervals
-        setInterval(createPipe, pipeInterval);
     </script>
 </body>
 </html>
