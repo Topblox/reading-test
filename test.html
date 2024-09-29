@@ -1,20 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Reading Speed Test</title>
+    <title>Reading test</title>
     <style>
-        body {
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-            margin: 0;
-            background-color: #f4f4f4;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-
         .container {
             text-align: center;
+            height: 100vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -22,44 +13,32 @@
             animation: slideUp 0.5s ease-in-out forwards;
         }
 
-        .word-display {
+        .menu {
             font-size: 48px;
             font-weight: bold;
             margin-bottom: 20px;
-            color: #333;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
             transition: color 0.5s ease-in-out, opacity 0.5s ease-in-out;
         }
 
-        .controls {
-            margin-top: 20px;
-        }
-
-        .level-display {
-            font-size: 24px;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-
-        .speed-display {
-            font-size: 18px;
-            margin-bottom: 20px;
-            color: #666;
-        }
-
-        .begin-button, .next-level-button {
+        .begin-button {
             padding: 15px 30px;
             font-size: 20px;
             background-color: #333;
             color: #fff;
             border: none;
             cursor: pointer;
-            transition: background-color 0.3s ease-in-out, transform 0.5s ease-in-out, color 0.5s ease-in-out;
+            transition: background-color 0.3s ease-in-out, transform 0.5s ease-in-out, color 0.5s ease-in-out, opacity 0.5s ease-in-out;
             border-radius: 30px;
-            margin: 10px;
         }
 
-        .begin-button:hover, .next-level-button:hover {
+        .begin-button:hover {
             background-color: #666;
+        }
+
+        .fading {
+            color: #fff;
+            opacity: 0;
         }
 
         @keyframes slideUp {
@@ -74,86 +53,29 @@
 </head>
 <body>
     <div class="container">
-        <div class="level-display">Level: <span id="level">1</span></div>
-        <div class="speed-display">Speed: <span id="speed">100</span> WPM</div>
-        <div class="word-display" id="word-display">Press Start to begin!</div>
-        <div class="controls">
-            <button class="begin-button" onclick="startTest()">Start</button>
-            <button class="next-level-button" onclick="nextLevel()" style="display: none;">Next Level</button>
-        </div>
+        <h1 class="menu">RSVP Reading Test</h1>
+        <button class="begin-button" onclick="redirectToRSVP()">Begin</button>
     </div>
     <script>
-        let level = 1;
-        let currentWordIndex = 0;
-        let wordInterval;
+        function redirectToRSVP() {
+            const container = document.querySelector('.container');
+            const menu = document.querySelector('.menu');
+            const button = document.querySelector('.begin-button');
 
-        // Define different word lists for each level
-        const wordLists = {
-            1: ["This", "is", "a", "basic", "reading", "test", "to", "measure", "your", "speed."],
-            2: ["As", "you", "progress", "through", "the", "test,", "the", "words", "will", "become", "more", "challenging."],
-            3: ["Advanced", "levels", "will", "push", "your", "reading", "speed", "even", "further."],
-            4: ["At", "higher", "levels,", "your", "reading", "speed", "and", "comprehension", "skills", "will", "be", "tested."],
-            5: ["Congratulations", "on", "reaching", "this", "level!", "You", "have", "demonstrated", "great", "skill."],
-            6: ["Pushing", "your", "reading", "limits", "will", "enhance", "your", "ability", "to", "process", "information."],
-            7: ["At", "this", "point,", "you", "are", "in", "a", "league", "of", "fast", "readers."],
-            8: ["Maintaining", "focus", "at", "higher", "speeds", "can", "be", "challenging,"],
-            9: ["Fast", "reading", "involves", "processing", "information", "efficiently."],
-            10: ["You", "are", "halfway", "through", "the", "test.", "Keep", "challenging", "yourself."],
-            11: ["Reaching", "this", "level", "requires", "determination", "and", "focus.", "You", "will", "need", "to", "stay", "alert", "to", "the", "words", "that", "appear", "on", "the", "screen."],
-            12: ["You", "are", "progressing", "very", "well.", "Don't", "worry", "if", "some", "words", "are", "a", "blur.", "Just", "keep", "your", "focus", "and", "let", "your", "eyes", "follow", "the", "text."],
-            13: ["Speed", "reading", "is", "a", "combination", "of", "practice,", "technique,", "and", "mindset.", "As", "you", "continue", "to", "read", "quickly,", "you", "will", "improve", "your", "overall", "comprehension."],
-            14: ["At", "this", "level,", "the", "words", "may", "feel", "like", "they", "are", "flying", "by.", "It's", "important", "to", "stay", "calm", "and", "not", "rush", "your", "reading.", "Take", "a", "deep", "breath", "and", "maintain", "your", "concentration."],
-            15: ["You", "have", "reached", "the", "final", "level!", "Finish", "strong!", "This", "is", "the", "culmination", "of", "all", "your", "hard", "work.", "Stay", "focused", "on", "the", "text", "and", "remember", "that", "practice", "makes", "perfect!"]
-        };
+            // Start fading out the text and button
+            setTimeout(() => {
+                menu.classList.add('fading');
+                button.classList.add('fading');
+            }, 250); // Adjust the delay as needed
 
-        const wordDisplay = document.getElementById('word-display');
-        const levelDisplay = document.getElementById('level');
-        const speedDisplay = document.getElementById('speed');
-        const startButton = document.querySelector('.begin-button');
-        const nextLevelButton = document.querySelector('.next-level-button');
+            // Remove the 'fading' class before redirecting
+            setTimeout(() => {
+                menu.classList.remove('fading');
+                button.classList.remove('fading');
 
-        function startTest() {
-            currentWordIndex = 0;
-            level = 1;
-            levelDisplay.textContent = level;
-            speedDisplay.textContent = "100"; // Set initial speed (without "WPM" for the initial speed)
-            startButton.style.display = 'none';
-            nextLevelButton.style.display = 'none';
-            displayWord();
-        }
-
-        function displayWord() {
-            if (level > 15) {
-                wordDisplay.textContent = "Test Complete!";
-                nextLevelButton.style.display = 'none';
-                return;
-            }
-
-            wordDisplay.textContent = wordLists[level][currentWordIndex];
-
-            // Calculate interval based on WPM for the current level
-            const wordsPerMinute = 100 + (level - 1) * 100;
-            const interval = 60000 / wordsPerMinute; // Calculate interval in milliseconds
-
-            // Move to the next word after the defined time
-            wordInterval = setInterval(() => {
-                currentWordIndex++;
-                if (currentWordIndex >= wordLists[level].length) {
-                    clearInterval(wordInterval);
-                    nextLevelButton.style.display = 'block'; // Show button to proceed to next level
-                    return;
-                }
-                wordDisplay.textContent = wordLists[level][currentWordIndex];
-            }, interval);
-        }
-
-        function nextLevel() {
-            level++;
-            currentWordIndex = 0;
-            levelDisplay.textContent = level;
-            speedDisplay.textContent = `${100 + (level - 1) * 100}`; // Update speed without "WPM"
-            nextLevelButton.style.display = 'none'; // Hide button until next level starts
-            displayWord();
+                // Redirect to the desired URL
+                window.location.href = 'test_beta.html'; // Replace with your actual URL
+            }, 750); // Adjust the delay as needed
         }
     </script>
 </body>
