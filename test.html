@@ -83,14 +83,6 @@
         </div>
     </div>
     <script>
-    // Specify the URL you want to check
-    const redirectUrl = 'https://topblox.github.io/reading-test/'; // Replace with your desired URL
-    const allowedReferrer = 'topblox.github.io/reading-test/index.html'; // Replace with the URL you're checking against
-
-    // Check if the document.referrer does not include the allowed URL
-    if (document.referrer !== allowedReferrer) {
-        window.location.href = redirectUrl; // Redirect if not from the allowed URL
-    }
         let level = 1;
         let currentWordIndex = 0;
         let wordInterval;
